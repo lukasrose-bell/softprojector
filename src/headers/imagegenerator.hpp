@@ -73,7 +73,7 @@ private:
     void drawBibleText(QPainter *painter, bool isShadow);
     void drawBibleTextToRect(QPainter *painter, QRect& trect, QRect& crect, QString ttext, QString ctext, int tflags, int cflags, int top, int left, int width, int height);
     void drawSongText(QPainter *painter, bool isShadow);
-    void drawSongTextInterleaved(QPainter *painter, bool draw, int left, int top, int width, int height,
+    void drawSongTextInterleaved(QPainter *painter, bool draw, bool isShadow, int left, int top, int width, int height,
                                  int hFlags, int vFlags, const QString &mainText, const QString &translitText,
                                  const QFont &mainFont, const QFont &translitFont, QRect &outRect);
     void drawAnnounceText(QPainter *painter, bool isShadow);

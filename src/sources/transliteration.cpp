@@ -27,17 +27,20 @@ static QMap<QChar, QString> buildTranslitMap()
 {
     QMap<QChar, QString> m;
 
+    // Russian Cyrillic to Latin mapping based on cyrtranslit (GOST 7.79-2000 System B)
+    // Source: https://github.com/opendatakosovo/cyrillic-transliteration
+
     // Russian uppercase
     m[QChar(0x0410)] = "A";    // А
     m[QChar(0x0411)] = "B";    // Б
     m[QChar(0x0412)] = "V";    // В
     m[QChar(0x0413)] = "G";    // Г
     m[QChar(0x0414)] = "D";    // Д
-    m[QChar(0x0415)] = "Ye";   // Е
-    m[QChar(0x0416)] = "Zh";   // Ж
+    m[QChar(0x0415)] = "E";    // Е
+    m[QChar(0x0416)] = "ZH";   // Ж
     m[QChar(0x0417)] = "Z";    // З
     m[QChar(0x0418)] = "I";    // И
-    m[QChar(0x0419)] = "Y";    // Й
+    m[QChar(0x0419)] = "J";    // Й
     m[QChar(0x041A)] = "K";    // К
     m[QChar(0x041B)] = "L";    // Л
     m[QChar(0x041C)] = "M";    // М
@@ -49,15 +52,15 @@ static QMap<QChar, QString> buildTranslitMap()
     m[QChar(0x0422)] = "T";    // Т
     m[QChar(0x0423)] = "U";    // У
     m[QChar(0x0424)] = "F";    // Ф
-    m[QChar(0x0425)] = "Kh";   // Х
-    m[QChar(0x0426)] = "Ts";   // Ц
-    m[QChar(0x0427)] = "Ch";   // Ч
-    m[QChar(0x0428)] = "Sh";   // Ш
-    m[QChar(0x0429)] = "Shch"; // Щ
-    m[QChar(0x042A)] = "";     // Ъ (hard sign)
-    m[QChar(0x042B)] = "Y";    // Ы
+    m[QChar(0x0425)] = "H";    // Х
+    m[QChar(0x0426)] = "CZ";   // Ц
+    m[QChar(0x0427)] = "CH";   // Ч
+    m[QChar(0x0428)] = "SH";   // Ш
+    m[QChar(0x0429)] = "SHH";  // Щ
+    m[QChar(0x042A)] = "''";   // Ъ (hard sign)
+    m[QChar(0x042B)] = "Y'";   // Ы
     m[QChar(0x042C)] = "'";    // Ь (soft sign)
-    m[QChar(0x042D)] = "E";    // Э
+    m[QChar(0x042D)] = "E'";   // Э
     m[QChar(0x042E)] = "Yu";   // Ю
     m[QChar(0x042F)] = "Ya";   // Я
 
@@ -67,11 +70,11 @@ static QMap<QChar, QString> buildTranslitMap()
     m[QChar(0x0432)] = "v";    // в
     m[QChar(0x0433)] = "g";    // г
     m[QChar(0x0434)] = "d";    // д
-    m[QChar(0x0435)] = "ye";   // е
+    m[QChar(0x0435)] = "e";    // е
     m[QChar(0x0436)] = "zh";   // ж
     m[QChar(0x0437)] = "z";    // з
     m[QChar(0x0438)] = "i";    // и
-    m[QChar(0x0439)] = "y";    // й
+    m[QChar(0x0439)] = "j";    // й
     m[QChar(0x043A)] = "k";    // к
     m[QChar(0x043B)] = "l";    // л
     m[QChar(0x043C)] = "m";    // м
@@ -83,20 +86,20 @@ static QMap<QChar, QString> buildTranslitMap()
     m[QChar(0x0442)] = "t";    // т
     m[QChar(0x0443)] = "u";    // у
     m[QChar(0x0444)] = "f";    // ф
-    m[QChar(0x0445)] = "kh";   // х
-    m[QChar(0x0446)] = "ts";   // ц
+    m[QChar(0x0445)] = "h";    // х
+    m[QChar(0x0446)] = "cz";   // ц
     m[QChar(0x0447)] = "ch";   // ч
     m[QChar(0x0448)] = "sh";   // ш
-    m[QChar(0x0449)] = "shch"; // щ
-    m[QChar(0x044A)] = "";     // ъ (hard sign)
-    m[QChar(0x044B)] = "y";    // ы
+    m[QChar(0x0449)] = "shh";  // щ
+    m[QChar(0x044A)] = "''";   // ъ (hard sign)
+    m[QChar(0x044B)] = "y'";   // ы
     m[QChar(0x044C)] = "'";    // ь (soft sign)
-    m[QChar(0x044D)] = "e";    // э
+    m[QChar(0x044D)] = "e'";   // э
     m[QChar(0x044E)] = "yu";   // ю
     m[QChar(0x044F)] = "ya";   // я
 
     // Common extras
-    m[QChar(0x0401)] = "Yo";   // Ё
+    m[QChar(0x0401)] = "YO";   // Ё
     m[QChar(0x0451)] = "yo";   // ё
 
     return m;
