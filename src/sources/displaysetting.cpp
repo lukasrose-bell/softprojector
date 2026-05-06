@@ -41,6 +41,7 @@ void SongDisplaySettings::clear()
     nRect = QRect();
     tRect = QRect();
     eRect = QRect();
+    trRect = QRect();
     tFlags = 0;
 }
 

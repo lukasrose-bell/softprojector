@@ -38,6 +38,7 @@ public:
     int number;
     QString stanza;
     QString stanzaTitle;
+    QString transliterationText; // Latin transliteration of Cyrillic text (empty when disabled)
     QString wordsBy;
     QString musicBy;
     QString tune;

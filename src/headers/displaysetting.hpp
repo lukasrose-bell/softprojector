@@ -50,6 +50,7 @@ public:
     QRect nRect;
     QRect tRect;
     QRect eRect;
+    QRect trRect; // transliteration text rect
     int tFlags;
     void clear();
 };

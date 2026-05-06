@@ -40,6 +40,7 @@
 #include "videoinfo.hpp"
 #include "slideshoweditor.hpp"
 #include "schedule.hpp"
+#include "transliteration.hpp"
 
 class QActionGroup;
 
@@ -125,6 +126,10 @@ private:
     QShortcut *shpgDwn;
     QShortcut *shSart1;
     QShortcut *shSart2;
+
+    // Transliteration
+    QAction *actionTransliterate;
+    bool transliterationEnabled;
 
     // Pictures
     QList<SlideShowItem> pictureShowList;
@@ -249,6 +254,7 @@ private slots:
 
     void on_actionCloseDisplay_triggered();
     void updateCloseDisplayButtons(bool isOn);
+    void toggleTransliteration(bool checked);
 
 protected:
     void closeEvent(QCloseEvent *event);

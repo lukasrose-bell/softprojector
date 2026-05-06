@@ -151,6 +151,17 @@ SoftProjector::SoftProjector(QWidget *parent)
     ui->toolBarShow->addAction(ui->actionHide);
     ui->toolBarShow->addAction(ui->actionCloseDisplay);
 
+    // Transliteration toggle
+    transliterationEnabled = false;
+    actionTransliterate = new QAction(tr("Transliterate"), this);
+    actionTransliterate->setCheckable(true);
+    actionTransliterate->setChecked(false);
+    actionTransliterate->setIcon(QIcon(":/icons/icons/transliterate.png"));
+    actionTransliterate->setToolTip(tr("Toggle Latin transliteration for Cyrillic song text"));
+    ui->toolBarShow->addSeparator();
+    ui->toolBarShow->addAction(actionTransliterate);
+    connect(actionTransliterate, SIGNAL(toggled(bool)), this, SLOT(toggleTransliteration(bool)));
+
     ui->actionShow->setEnabled(false);
     ui->actionHide->setEnabled(false);
     ui->actionClear->setEnabled(false);
@@ -955,38 +966,44 @@ void SoftProjector::showSong(int currentRow)
         current_song.getSettings(s4);
     }
 
-    pds1->renderSongText(current_song.getStanza(currentRow),s1);
+    Stanza stanza = current_song.getStanza(currentRow);
+
+    // Apply transliteration if enabled and text contains Cyrillic
+    if(transliterationEnabled && containsCyrillic(stanza.stanza))
+        stanza.transliterationText = transliterateCyrillicToLatin(stanza.stanza);
+
+    pds1->renderSongText(stanza,s1);
     if(hasDisplayScreen2)
     {
         if(!theme.song2.useDisp1settings)
         {
-            pds2->renderSongText(current_song.getStanza(currentRow),s2);
+            pds2->renderSongText(stanza,s2);
         }
         else
         {
-            pds2->renderSongText(current_song.getStanza(currentRow),s1);
+            pds2->renderSongText(stanza,s1);
         }
     }
     if(hasDisplayScreen3)
     {
         if(!theme.song3.useDisp1settings)
         {
-            pds3->renderSongText(current_song.getStanza(currentRow),s3);
+            pds3->renderSongText(stanza,s3);
         }
         else
         {
-            pds3->renderSongText(current_song.getStanza(currentRow),s1);
+            pds3->renderSongText(stanza,s1);
         }
     }
     if(hasDisplayScreen4)
     {
         if(!theme.song4.useDisp1settings)
         {
-            pds4->renderSongText(current_song.getStanza(currentRow),s4);
+            pds4->renderSongText(stanza,s4);
         }
         else
         {
-            pds4->renderSongText(current_song.getStanza(currentRow),s1);
+            pds4->renderSongText(stanza,s1);
         }
     }
 
@@ -1148,6 +1165,14 @@ void SoftProjector::updateCloseDisplayButtons(bool isOn)
         ui->actionCloseDisplay->setIcon(QIcon(":/icons/icons/display_on.png"));
     else
         ui->actionCloseDisplay->setIcon(QIcon(":/icons/icons/display_off.png"));
+}
+
+void SoftProjector::toggleTransliteration(bool checked)
+{
+    transliterationEnabled = checked;
+    // Re-render current song if one is showing
+    if(showing && pType == SONG)
+        updateScreen();
 }
 
 void SoftProjector::on_actionSettings_triggered()

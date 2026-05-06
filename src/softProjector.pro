@@ -45,6 +45,8 @@ UI_DIR = $${RES_DIR}/ui
 RCC_DIR = $${RES_DIR}/rcc
 OUT_PWD = $${RES_DIR}/bin
 
+INCLUDEPATH += $$PWD/../3rdparty/headers
+
 SOURCES += sources/main.cpp \
     sources/softprojector.cpp \
     sources/songwidget.cpp \
@@ -88,7 +90,8 @@ SOURCES += sources/main.cpp \
     sources/projectordisplayscreen.cpp \
     sources/imagegenerator.cpp \
     sources/spimageprovider.cpp \
-    sources/mediacontrol.cpp
+    sources/mediacontrol.cpp \
+    sources/transliteration.cpp
 HEADERS += headers/softprojector.hpp \
     headers/songwidget.hpp \
     headers/biblewidget.hpp \
@@ -131,7 +134,8 @@ HEADERS += headers/softprojector.hpp \
     headers/projectordisplayscreen.hpp \
     headers/imagegenerator.hpp \
     headers/spimageprovider.hpp \
-    headers/mediacontrol.hpp
+    headers/mediacontrol.hpp \
+    headers/transliteration.hpp
 FORMS += ui/softprojector.ui \
     ui/songwidget.ui \
     ui/biblewidget.ui \
