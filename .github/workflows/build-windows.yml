@@ -1,0 +1,52 @@
+name: Build Windows
+
+on:
+  push:
+    branches: [dev, main, master]
+  pull_request:
+    branches: [dev, main, master]
+  workflow_dispatch:  # allows manual trigger from GitHub UI
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.7.3'
+          host: 'windows'
+          target: 'desktop'
+          arch: 'win64_msvc2019_64'
+          modules: 'qtmultimedia'
+
+      - name: Setup MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Run qmake
+        working-directory: src
+        run: qmake softProjector.pro
+
+      - name: Build
+        working-directory: src
+        run: nmake
+
+      - name: Create deployment folder
+        run: |
+          mkdir deploy
+          copy src\win32_build\bin\SoftProjector.exe deploy\
+
+      - name: Run windeployqt
+        run: windeployqt --qmldir src\qml deploy\SoftProjector.exe
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SoftProjector-Windows-x64
+          path: deploy/

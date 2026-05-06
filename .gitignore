@@ -35,3 +35,7 @@ unknownsys_build/*
 win32_build/*
 unix_build/*
 mac_build/*
+
+#bmad
+*bmad*
+_bmad*
