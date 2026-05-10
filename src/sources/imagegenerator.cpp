@@ -925,7 +925,7 @@ void ImageGenerator::drawSongTextInterleaved(QPainter *painter, bool draw, bool 
     // Second pass: draw lines with gap between pairs, word-by-word alignment
     QPen savedPen = painter->pen();
     // Transliteration color: only apply for normal pass, shadow pass keeps shadow color
-    QPen translitPen = isShadow ? savedPen : QPen(QColor("#4A6A8A"));
+    QPen translitPen = isShadow ? savedPen : QPen(QColor("#edffc3"));
     int curY = startY;
     for(int i = 0; i < mainLines.size(); ++i)
     {
