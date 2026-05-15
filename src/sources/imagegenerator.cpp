@@ -602,7 +602,7 @@ void ImageGenerator::drawSongText(QPainter *painter, bool isShadow)
         if(hasTranslit)
         {
             // When transliteration is active, measure interleaved line-by-line height
-            translitFont.setPointSize(main_font.pointSize() / 2);
+            translitFont.setPointSize(main_font.pointSize() / 1.7);
             translitFont.setItalic(true);
 
             int hFlags = 0;
@@ -622,7 +622,7 @@ void ImageGenerator::drawSongText(QPainter *painter, bool isShadow)
             while(mainw > width || totalh > height)
             {
                 main_font.setPointSize(main_font.pointSize() - 1);
-                translitFont.setPointSize(main_font.pointSize() / 2);
+                translitFont.setPointSize(main_font.pointSize() / 1.7);
 
                 drawSongTextInterleaved(painter, false, false, left, top, width, height,
                                         hFlags, Qt::AlignTop, main_text, m_stanza.transliterationText,
@@ -719,7 +719,7 @@ void ImageGenerator::drawSongText(QPainter *painter, bool isShadow)
         else if(m_sSets.textAlignmentV==1) interleavedVFlags = Qt::AlignVCenter;
         else if(m_sSets.textAlignmentV==2) interleavedVFlags = Qt::AlignBottom;
         interleavedTranslitFont = m_sSets.textFont;
-        interleavedTranslitFont.setPointSize(m_sSets.textFont.pointSize() / 2);
+        interleavedTranslitFont.setPointSize(m_sSets.textFont.pointSize() / 1.7);
         interleavedTranslitFont.setItalic(true);
     }
 
