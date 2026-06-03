@@ -77,6 +77,11 @@ SongSettings::SongSettings()
     screenUse = 100;
     screenPositon = 1;
     useDisp1settings = false;
+    // Transliteration text defaults
+    transliterationTextColor = QColor("#edffc3"); // Light yellow
+    transliterationTextFont.fromString("Arial,24,-1,5,50,1,0,0,0,0"); // Half size, italic
+    transliterationTextAlignmentV = 1; // Middle
+    transliterationTextAlignmentH = 1; // Center
 }
 
 AnnounceSettings::AnnounceSettings()
@@ -191,8 +196,10 @@ void Theme::saveSongNew(int screen, SongSettings &settings)
                "show_key, show_number, info_color, info_font, info_align, show_song_ending, ending_color, ending_font, "
                "ending_type, ending_position, use_background, background_name, background, text_font, text_color, "
                "text_align_v, text_align_h, screen_use, screen_position, use_disp_1, "
-               "add_background_color_to_text, text_rec_background_color, text_gen_background_color) "
-               "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+               "add_background_color_to_text, text_rec_background_color, text_gen_background_color, "
+               "translit_text_color, translit_text_font, translit_text_align_v, translit_text_align_h, translit_text_spacing, "
+               "translit_line_spacing, translit_compact_enabled, translit_compact_threshold) "
+               "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
     sq.addBindValue(m_info.themeId);
     sq.addBindValue(screen);
     sq.addBindValue(settings.useShadow);
@@ -222,6 +229,14 @@ void Theme::saveSongNew(int screen, SongSettings &settings)
     sq.addBindValue(settings.songAddBKColorToText);
     sq.addBindValue((unsigned int)(settings.songTextRecBKColor.rgb()));
     sq.addBindValue((unsigned int)(settings.songTextGenBKColor.rgb()));
+    sq.addBindValue((unsigned int)(settings.transliterationTextColor.rgb()));
+    sq.addBindValue(settings.transliterationTextFont.toString());
+    sq.addBindValue(settings.transliterationTextAlignmentV);
+    sq.addBindValue(settings.transliterationTextAlignmentH);
+    sq.addBindValue(settings.songLineSpacing);
+    sq.addBindValue(settings.transliterationLineSpacing);
+    sq.addBindValue(settings.transliterationCompactEnabled);
+    sq.addBindValue(settings.transliterationCompactThreshold);
     sq.exec();
 }
 
@@ -332,7 +347,9 @@ void Theme::saveSongUpdate(int screen, SongSettings &settings)
                "show_song_ending = ?, ending_color = ?, ending_font = ?, ending_type = ?, ending_position = ?, "
                "use_background = ?, background_name = ?, background = ?, text_font = ?, text_color = ?, text_align_v = ?, "
                "text_align_h = ?, screen_use = ?, screen_position = ?, use_disp_1 = ?, "
-               "add_background_color_to_text = ?, text_rec_background_color = ?, text_gen_background_color = ? "
+               "add_background_color_to_text = ?, text_rec_background_color = ?, text_gen_background_color = ?, "
+               "translit_text_color = ?, translit_text_font = ?, translit_text_align_v = ?, translit_text_align_h = ?, translit_text_spacing = ?, "
+               "translit_line_spacing = ?, translit_compact_enabled = ?, translit_compact_threshold = ? "
                "WHERE theme_id = ? AND disp = ?");
     sq.addBindValue(settings.useShadow);
     sq.addBindValue(settings.useFading);
@@ -361,6 +378,14 @@ void Theme::saveSongUpdate(int screen, SongSettings &settings)
     sq.addBindValue(settings.songAddBKColorToText);
     sq.addBindValue((unsigned int)(settings.songTextRecBKColor.rgb()));
     sq.addBindValue((unsigned int)(settings.songTextGenBKColor.rgb()));
+    sq.addBindValue((unsigned int)(settings.transliterationTextColor.rgb()));
+    sq.addBindValue(settings.transliterationTextFont.toString());
+    sq.addBindValue(settings.transliterationTextAlignmentV);
+    sq.addBindValue(settings.transliterationTextAlignmentH);
+    sq.addBindValue(settings.songLineSpacing);
+    sq.addBindValue(settings.transliterationLineSpacing);
+    sq.addBindValue(settings.transliterationCompactEnabled);
+    sq.addBindValue(settings.transliterationCompactThreshold);
     sq.addBindValue(m_info.themeId);
     sq.addBindValue(screen);
     sq.exec();
@@ -517,6 +542,15 @@ void Theme::loadSong(int screen, SongSettings &settings)
     settings.songAddBKColorToText = sr.field("add_background_color_to_text").value().toBool();
     settings.songTextRecBKColor = QColor::fromRgb(sr.field("text_rec_background_color").value().toUInt());
     settings.songTextGenBKColor = QColor::fromRgb(sr.field("text_gen_background_color").value().toUInt());
+    // Load transliteration settings
+    settings.transliterationTextColor = QColor::fromRgb(sr.field("translit_text_color").value().toUInt());
+    settings.transliterationTextFont.fromString(sr.field("translit_text_font").value().toString());
+    settings.transliterationTextAlignmentV = sr.field("translit_text_align_v").value().toInt();
+    settings.transliterationTextAlignmentH = sr.field("translit_text_align_h").value().toInt();
+    settings.songLineSpacing = sr.field("translit_text_spacing").value().toInt();
+    settings.transliterationLineSpacing = sr.field("translit_line_spacing").value().toInt();
+    settings.transliterationCompactEnabled = sr.field("translit_compact_enabled").value().toBool();
+    settings.transliterationCompactThreshold = sr.field("translit_compact_threshold").value().toInt();
 }
 
 void Theme::loadAnnounce(int screen, TextSettings &settings)

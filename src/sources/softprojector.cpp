@@ -157,7 +157,9 @@ SoftProjector::SoftProjector(QWidget *parent)
     actionTransliterate->setCheckable(true);
     actionTransliterate->setChecked(false);
     actionTransliterate->setIcon(QIcon(":/icons/icons/transliterate.png"));
-    actionTransliterate->setToolTip(tr("Toggle Latin transliteration for Cyrillic song text"));
+    actionTransliterate->setShortcut(QKeySequence(Qt::Key_F12));
+    actionTransliterate->setToolTip(tr("Toggle Latin transliteration for Cyrillic song text (F12)"));
+    actionTransliterate->setStatusTip(tr("Toggle Latin transliteration for Cyrillic song text (F12)"));
     ui->toolBarShow->addSeparator();
     ui->toolBarShow->addAction(actionTransliterate);
     connect(actionTransliterate, SIGNAL(toggled(bool)), this, SLOT(toggleTransliteration(bool)));
@@ -516,7 +518,8 @@ void SoftProjector::keyPressEvent(QKeyEvent *event)
 {
     // Will get called when a key is pressed
     int key = event->key();
-    if(key == Qt::Key_F6)
+    Qt::KeyboardModifiers mods = event->modifiers();
+    if(key == Qt::Key_F6 && (mods & Qt::ControlModifier))
     {
         ui->projectTab->setCurrentWidget(bibleWidget);
         bibleWidget->setBibleBookActive();
@@ -1775,7 +1778,7 @@ void SoftProjector::retranslateUis()
     }
 
     ui->retranslateUi(this);
-    ui->projectTab->setTabText(0, tr("Bible (F6)"));
+    ui->projectTab->setTabText(0, tr("Bible (Ctrl+F6)"));
     ui->projectTab->setTabText(1, tr("Songs (F7)"));
     ui->projectTab->setTabText(2, tr("Pictures"));
 //    ui->projectTab->setTabText(3, tr("Media"));

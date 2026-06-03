@@ -1591,7 +1591,10 @@ void ManageDataDialog::exportTheme(QString path, bool all)
                      "'ending_color' INTEGER, 'ending_font' TEXT, 'ending_type' INTEGER, 'ending_position' INTEGER, "
                      "'use_background' BOOL, 'background_name' TEXT, 'background' BLOB, 'text_font' TEXT, "
                      "'text_color' INTEGER, 'text_align_v' INTEGER, 'text_align_h' INTEGER, "
-                     "'screen_use' INTEGER, 'screen_position' INTEGER, 'use_disp_1' BOOL)");
+                     "'screen_use' INTEGER, 'screen_position' INTEGER, 'use_disp_1' BOOL, "
+                     "'add_background_color_to_text' BOOL, 'text_rec_background_color' INTEGER, 'text_gen_background_color' INTEGER, "
+                     "'translit_text_color' INTEGER, 'translit_text_font' TEXT, 'translit_text_align_v' INTEGER, 'translit_text_align_h' INTEGER, "
+                     "'translit_text_spacing' INTEGER, 'translit_line_spacing' INTEGER, 'translit_compact_enabled' BOOL, 'translit_compact_threshold' INTEGER)");
             sqt.exec("CREATE TABLE 'Themes' ('id' INTEGER , 'name' TEXT, 'comment' TEXT)");
 
             if(all)
@@ -1765,9 +1768,12 @@ void ManageDataDialog::transferThemeSong(QSqlQuery &sqf, QSqlQuery &sqt, int tmI
     sqt.prepare("INSERT INTO ThemeSong (theme_id, disp, use_shadow, use_fading, use_blur_shadow, show_stanza_title, "
                 "show_key, show_number, info_color, info_font, info_align, show_song_ending, ending_color, ending_font, "
                 "ending_type, ending_position, use_background, background_name, background, text_font, text_color, "
-                "text_align_v, text_align_h, screen_use, screen_position, use_disp_1) "
+                "text_align_v, text_align_h, screen_use, screen_position, use_disp_1, "
+                "add_background_color_to_text, text_rec_background_color, text_gen_background_color, "
+                "translit_text_color, translit_text_font, translit_text_align_v, translit_text_align_h, translit_text_spacing, "
+                "translit_line_spacing, translit_compact_enabled, translit_compact_threshold) "
                 "VALUES(:id, :di, :us, :uf, :uu, :ss, :sk, :sn, :ic, :if, :ia, :se, :ec, :ef, :et, :ep, "
-                ":ub, :bn, :ba, :tf, :tc, :av, :ah, :su, :sp, :ud)");
+                ":ub, :bn, :ba, :tf, :tc, :av, :ah, :su, :sp, :ud, :ab, :tr, :tg, :ttc, :ttf, :ttav, :ttah, :tts, :tls, :tce, :tct)");
 
     while(sqf.next())
     {
@@ -1800,6 +1806,17 @@ void ManageDataDialog::transferThemeSong(QSqlQuery &sqf, QSqlQuery &sqt, int tmI
         sqt.bindValue(":su",sqf.record().value("screen_use"));
         sqt.bindValue(":sp",sqf.record().value("screen_position"));
         sqt.bindValue(":ud",sqf.record().value("use_disp_1"));
+        sqt.bindValue(":ab",sqf.record().value("add_background_color_to_text"));
+        sqt.bindValue(":tr",sqf.record().value("text_rec_background_color"));
+        sqt.bindValue(":tg",sqf.record().value("text_gen_background_color"));
+        sqt.bindValue(":ttc",sqf.record().value("translit_text_color"));
+        sqt.bindValue(":ttf",sqf.record().value("translit_text_font"));
+        sqt.bindValue(":ttav",sqf.record().value("translit_text_align_v"));
+        sqt.bindValue(":ttah",sqf.record().value("translit_text_align_h"));
+        sqt.bindValue(":tts",sqf.record().value("translit_text_spacing"));
+        sqt.bindValue(":tls",sqf.record().value("translit_line_spacing"));
+        sqt.bindValue(":tce",sqf.record().value("translit_compact_enabled"));
+        sqt.bindValue(":tct",sqf.record().value("translit_compact_threshold"));
         sqt.exec();
     }
 }

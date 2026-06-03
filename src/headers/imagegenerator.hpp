@@ -75,7 +75,8 @@ private:
     void drawSongText(QPainter *painter, bool isShadow);
     void drawSongTextInterleaved(QPainter *painter, bool draw, bool isShadow, int left, int top, int width, int height,
                                  int hFlags, int vFlags, const QString &mainText, const QString &translitText,
-                                 const QFont &mainFont, const QFont &translitFont, QRect &outRect);
+                                 const QFont &mainFont, const QFont &translitFont, const QColor &translitColor,
+                                 int translitHAlign, int translitVAlign, QRect &outRect);
     void drawAnnounceText(QPainter *painter, bool isShadow);
 //    void fastbluralpha(QImage &img, int radius);
     QPixmap applyEffectToImage(QPixmap src, QGraphicsEffect *effect);

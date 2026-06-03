@@ -27,7 +27,7 @@
 // x - Official release. ex: 2 - for SoftProjector 2
 // xxx - Official sub realeas. ex: 201 - for SoftProjector 2.01
 // 990xxx - Development release. ex: 990206 - for SoftProjector 2 Development Build 6 (2db6)
-int const dbVer = 2;
+int const dbVer = 6;
 
 bool connect(QString database_file)
 {
@@ -99,7 +99,9 @@ bool connect(QString database_file)
                     "'use_background' BOOL, 'background_name' TEXT, 'background' BLOB, 'text_font' TEXT, "
                     "'text_color' INTEGER, 'text_align_v' INTEGER, 'text_align_h' INTEGER, "
                     "'screen_use' INTEGER, 'screen_position' INTEGER, 'use_disp_1' BOOL, "
-                    "'add_background_color_to_text' BOOL, 'text_rec_background_color' INTEGER, 'text_gen_background_color' INTEGER)");
+                    "'add_background_color_to_text' BOOL, 'text_rec_background_color' INTEGER, 'text_gen_background_color' INTEGER, "
+                    "'translit_text_color' INTEGER, 'translit_text_font' TEXT, 'translit_text_align_v' INTEGER, 'translit_text_align_h' INTEGER, "
+                    "'translit_text_spacing' INTEGER, 'translit_line_spacing' INTEGER, 'translit_compact_enabled' BOOL, 'translit_compact_threshold' INTEGER)");
             //sq.exec("CREATE TABLE 'ThemeData' ('theme_id' INTEGER, 'type' TEXT, 'sets' TEXT)");
             sq.exec("CREATE TABLE 'Themes' ('id' INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL , 'name' TEXT, 'comment' TEXT)");
         }
@@ -301,6 +303,38 @@ int main(int argc, char *argv[])
     sq.exec("PRAGMA user_version");
     sq.first();
     int dbVersion = sq.value(0).toInt();
+    if(dbVersion == 2)
+    {
+        // Migrate from version 2 to 3: add transliteration text properties to ThemeSong
+        sq.exec("ALTER TABLE ThemeSong ADD COLUMN 'translit_text_color' INTEGER");
+        sq.exec("ALTER TABLE ThemeSong ADD COLUMN 'translit_text_font' TEXT");
+        sq.exec("ALTER TABLE ThemeSong ADD COLUMN 'translit_text_align_v' INTEGER");
+        sq.exec("ALTER TABLE ThemeSong ADD COLUMN 'translit_text_align_h' INTEGER");
+        sq.exec("PRAGMA user_version = 3");
+        dbVersion = 3;
+    }
+    if(dbVersion == 3)
+    {
+        // Migrate from version 3 to 4: add transliteration spacing to ThemeSong
+        sq.exec("ALTER TABLE ThemeSong ADD COLUMN 'translit_text_spacing' INTEGER DEFAULT 6");
+        sq.exec("PRAGMA user_version = 4");
+        dbVersion = 4;
+    }
+    if(dbVersion == 4)
+    {
+        // Migrate from version 4 to 5: add transliteration compaction settings to ThemeSong
+        sq.exec("ALTER TABLE ThemeSong ADD COLUMN 'translit_compact_enabled' BOOL DEFAULT 1");
+        sq.exec("ALTER TABLE ThemeSong ADD COLUMN 'translit_compact_threshold' INTEGER DEFAULT 7");
+        sq.exec("PRAGMA user_version = 5");
+        dbVersion = 5;
+    }
+    if(dbVersion == 5)
+    {
+        // Migrate from version 5 to 6: split song line spacing from transliteration pair spacing
+        sq.exec("ALTER TABLE ThemeSong ADD COLUMN 'translit_line_spacing' INTEGER DEFAULT 0");
+        sq.exec(QString("PRAGMA user_version = %1").arg(dbVer));
+        dbVersion = dbVer;
+    }
     if(dbVer != dbVersion)
     {
         QString errortxt = QString("SoftProjector requires database vesion # %1\n"

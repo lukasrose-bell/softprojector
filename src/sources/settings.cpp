@@ -108,6 +108,14 @@ SongSettings::SongSettings()
     songAddBKColorToText = false;
     songTextRecBKColor = QColor(Qt::black);
     songTextGenBKColor = QColor(Qt::green);
+    transliterationTextColor = QColor("#edffc3");
+    transliterationTextFont.fromString("Arial,24,-1,5,50,1,0,0,0,0");
+    transliterationTextAlignmentV = 1;
+    transliterationTextAlignmentH = 1;
+    songLineSpacing = 6;
+    transliterationLineSpacing = 0;
+    transliterationCompactEnabled = true;
+    transliterationCompactThreshold = 7;
     setChangeHandes();
 }
 

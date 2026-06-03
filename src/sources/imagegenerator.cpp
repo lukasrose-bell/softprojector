@@ -20,6 +20,117 @@
 #include "../headers/imagegenerator.hpp"
 #include "../headers/transliteration.hpp"
 
+static bool isPunctuationOnlyLine(const QString &line)
+{
+    QString trimmed = line.trimmed();
+    if(trimmed.isEmpty())
+        return true;
+
+    for(int i = 0; i < trimmed.size(); ++i)
+    {
+        QChar ch = trimmed.at(i);
+        if(ch.isLetterOrNumber())
+            return false;
+    }
+    return true;
+}
+
+static QString joinLinesWithSpace(const QString &a, const QString &b)
+{
+    QString ta = a.trimmed();
+    QString tb = b.trimmed();
+    if(ta.isEmpty())
+        return tb;
+    if(tb.isEmpty())
+        return ta;
+    return ta + " " + tb;
+}
+
+static void compactInterleavedVerseLines(QPainter *painter,
+                                         const QFont &mainFont,
+                                         const QFont &translitFont,
+                                         int width,
+                                         bool compactEnabled,
+                                         int compactThreshold,
+                                         const QString &mainText,
+                                         const QString &translitText,
+                                         QString &outMainText,
+                                         QString &outTranslitText)
+{
+    outMainText = mainText;
+    outTranslitText = translitText;
+    Q_UNUSED(translitFont);
+
+    if(!compactEnabled)
+        return;
+
+    QStringList mainLines = mainText.split("\n", Qt::KeepEmptyParts);
+    if(mainLines.size() < 2)
+        return;
+
+    int nonEmptyCount = 0;
+    for(int i = 0; i < mainLines.size(); ++i)
+    {
+        if(!mainLines.at(i).trimmed().isEmpty())
+            ++nonEmptyCount;
+    }
+    if(nonEmptyCount < compactThreshold)
+        return;
+
+    QStringList translitLines = translitText.split("\n", Qt::KeepEmptyParts);
+    while(translitLines.size() < mainLines.size())
+        translitLines.append(QString());
+
+    int safeWidth = width;
+
+    auto mergedMainWidth = [&](const QString &mergedMain) -> int {
+        painter->setFont(mainFont);
+        return painter->fontMetrics().horizontalAdvance(mergedMain.trimmed());
+    };
+
+    int mergesDone = 0;
+
+    while(true)
+    {
+        int bestIdx = -1;
+        int bestWidth = safeWidth + 1;
+
+        for(int i = 0; i + 1 < mainLines.size(); ++i)
+        {
+            QString leftMain = mainLines.at(i);
+            QString rightMain = mainLines.at(i + 1);
+
+            bool leftProtected = leftMain.trimmed().isEmpty() || isPunctuationOnlyLine(leftMain);
+            bool rightProtected = rightMain.trimmed().isEmpty() || isPunctuationOnlyLine(rightMain);
+            if(leftProtected || rightProtected)
+                continue;
+
+            QString mergedMain = joinLinesWithSpace(leftMain, rightMain);
+            int widthAfterMerge = mergedMainWidth(mergedMain);
+            if(widthAfterMerge <= safeWidth && widthAfterMerge < bestWidth)
+            {
+                bestIdx = i;
+                bestWidth = widthAfterMerge;
+            }
+        }
+
+        if(bestIdx < 0)
+            break;
+
+        mainLines[bestIdx] = joinLinesWithSpace(mainLines.at(bestIdx), mainLines.at(bestIdx + 1));
+        translitLines[bestIdx] = joinLinesWithSpace(translitLines.at(bestIdx), translitLines.at(bestIdx + 1));
+        mainLines.removeAt(bestIdx + 1);
+        translitLines.removeAt(bestIdx + 1);
+        ++mergesDone;
+    }
+
+    if(mergesDone > 0)
+    {
+        outMainText = mainLines.join("\n");
+        outTranslitText = translitLines.join("\n");
+    }
+}
+
 
 ImageGenerator::ImageGenerator()
 {
@@ -95,6 +206,7 @@ QPixmap ImageGenerator::generateSongImage(Stanza stanza, SongSettings &sSets)
     m_sSets.textFont.setPointSize(m_sSets.textFont.pointSize() * 3);
     m_sSets.endingFont.setPointSize(m_sSets.endingFont.pointSize() * 3);
     m_sSets.infoFont.setPointSize(m_sSets.infoFont.pointSize() * 3);
+    m_sSets.transliterationTextFont.setPointSize(m_sSets.transliterationTextFont.pointSize() * 3);
 
     // TODO:FIX
 //    m_shadow = (m_sSets.effectsType == 1 || m_sSets.effectsType == 2);
@@ -572,8 +684,18 @@ void ImageGenerator::drawSongText(QPainter *painter, bool isShadow)
 
     QFont main_font = m_sSets.textFont;
 
+    QString displayMainText = main_text;
+    QString displayTranslitText = m_stanza.transliterationText;
+    if(!displayTranslitText.isEmpty())
+    {
+        compactInterleavedVerseLines(painter, m_sSets.textFont, m_sSets.transliterationTextFont, width,
+                                     m_sSets.transliterationCompactEnabled, m_sSets.transliterationCompactThreshold,
+                                     main_text, m_stanza.transliterationText,
+                                     displayMainText, displayTranslitText);
+    }
+
     int caph, endh, mainh, mainw, totalh;
-    bool hasTranslit = !m_stanza.transliterationText.isEmpty();
+    bool hasTranslit = !displayTranslitText.isEmpty();
     QFont translitFont = m_sSets.textFont;
     int translitAndMainH = 0;
 
@@ -602,18 +724,24 @@ void ImageGenerator::drawSongText(QPainter *painter, bool isShadow)
         if(hasTranslit)
         {
             // When transliteration is active, measure interleaved line-by-line height
-            translitFont.setPointSize(main_font.pointSize() / 1.7);
-            translitFont.setItalic(true);
+            // Use the transliteration settings
+            translitFont = m_sSets.transliterationTextFont;
 
             int hFlags = 0;
             if(m_sSets.textAlignmentH==0) hFlags = Qt::AlignLeft;
             else if(m_sSets.textAlignmentH==1) hFlags = Qt::AlignHCenter;
             else if(m_sSets.textAlignmentH==2) hFlags = Qt::AlignRight;
 
+            int translitVAlign = 0;
+            if(m_sSets.transliterationTextAlignmentV==0) translitVAlign = Qt::AlignTop;
+            else if(m_sSets.transliterationTextAlignmentV==1) translitVAlign = Qt::AlignVCenter;
+            else if(m_sSets.transliterationTextAlignmentV==2) translitVAlign = Qt::AlignBottom;
+
             QRect interleavedRect;
             drawSongTextInterleaved(painter, false, false, left, top, width, height,
-                                    hFlags, Qt::AlignTop, main_text, m_stanza.transliterationText,
-                                    main_font, translitFont, interleavedRect);
+                                    hFlags, translitVAlign, displayMainText, displayTranslitText,
+                                    main_font, translitFont, m_sSets.transliterationTextColor,
+                                    m_sSets.transliterationTextAlignmentH, translitVAlign, interleavedRect);
             translitAndMainH = interleavedRect.height();
             mainw = interleavedRect.width();
             totalh = caph + endh + translitAndMainH;
@@ -622,11 +750,12 @@ void ImageGenerator::drawSongText(QPainter *painter, bool isShadow)
             while(mainw > width || totalh > height)
             {
                 main_font.setPointSize(main_font.pointSize() - 1);
-                translitFont.setPointSize(main_font.pointSize() / 1.7);
+                translitFont.setPointSize(translitFont.pointSize() - 1);
 
                 drawSongTextInterleaved(painter, false, false, left, top, width, height,
-                                        hFlags, Qt::AlignTop, main_text, m_stanza.transliterationText,
-                                        main_font, translitFont, interleavedRect);
+                                        hFlags, translitVAlign, displayMainText, displayTranslitText,
+                                        main_font, translitFont, m_sSets.transliterationTextColor,
+                                        m_sSets.transliterationTextAlignmentH, translitVAlign, interleavedRect);
                 translitAndMainH = interleavedRect.height();
                 mainw = interleavedRect.width();
                 totalh = caph + endh + translitAndMainH;
@@ -644,7 +773,7 @@ void ImageGenerator::drawSongText(QPainter *painter, bool isShadow)
             // Original non-transliteration preparation
             // Prepare Main Text
             painter->setFont(main_font);
-            main_rect = boundRectOrDrawText(painter, false, left, top, width, height, main_flags, main_text);
+            main_rect = boundRectOrDrawText(painter, false, left, top, width, height, main_flags, displayMainText);
 
             mainh = main_rect.height();
             mainw = main_rect.width();
@@ -655,7 +784,7 @@ void ImageGenerator::drawSongText(QPainter *painter, bool isShadow)
             {
                 main_font.setPointSize(main_font.pointSize() - 1);
                 painter->setFont(main_font);
-                main_rect = boundRectOrDrawText(painter, false, left, top, width, height, main_flags, main_text);
+                main_rect = boundRectOrDrawText(painter, false, left, top, width, height, main_flags, displayMainText);
                 mainh = main_rect.height();
                 mainw = main_rect.width();
                 totalh = caph+endh+mainh;
@@ -669,7 +798,7 @@ void ImageGenerator::drawSongText(QPainter *painter, bool isShadow)
 
                 // Prepare Main Text
                 painter->setFont(m_sSets.textFont);
-                main_rect = boundRectOrDrawText(painter, false, left, top, width, height, main_flags, main_text);
+                main_rect = boundRectOrDrawText(painter, false, left, top, width, height, main_flags, displayMainText);
                 mainh = main_rect.height();
                 mainw = main_rect.width();
                 totalh = caph+endh+mainh;
@@ -679,7 +808,7 @@ void ImageGenerator::drawSongText(QPainter *painter, bool isShadow)
                 {
                     main_font.setPointSize(main_font.pointSize() - 1);
                     painter->setFont(main_font);
-                    main_rect = boundRectOrDrawText(painter, false, left, top, width, height, main_flags, main_text);
+                    main_rect = boundRectOrDrawText(painter, false, left, top, width, height, main_flags, displayMainText);
                     mainh = main_rect.height();
                     mainw = main_rect.width();
                     totalh = caph+endh+mainh;
@@ -715,12 +844,10 @@ void ImageGenerator::drawSongText(QPainter *painter, bool isShadow)
         if(m_sSets.textAlignmentH==0) interleavedHFlags = Qt::AlignLeft;
         else if(m_sSets.textAlignmentH==1) interleavedHFlags = Qt::AlignHCenter;
         else if(m_sSets.textAlignmentH==2) interleavedHFlags = Qt::AlignRight;
-        if(m_sSets.textAlignmentV==0) interleavedVFlags = Qt::AlignTop;
-        else if(m_sSets.textAlignmentV==1) interleavedVFlags = Qt::AlignVCenter;
-        else if(m_sSets.textAlignmentV==2) interleavedVFlags = Qt::AlignBottom;
-        interleavedTranslitFont = m_sSets.textFont;
-        interleavedTranslitFont.setPointSize(m_sSets.textFont.pointSize() / 1.7);
-        interleavedTranslitFont.setItalic(true);
+        if(m_sSets.transliterationTextAlignmentV==0) interleavedVFlags = Qt::AlignTop;
+        else if(m_sSets.transliterationTextAlignmentV==1) interleavedVFlags = Qt::AlignVCenter;
+        else if(m_sSets.transliterationTextAlignmentV==2) interleavedVFlags = Qt::AlignBottom;
+        interleavedTranslitFont = m_sSets.transliterationTextFont;
     }
 
     if(m_songAddBKColorToText == 1)
@@ -744,13 +871,14 @@ void ImageGenerator::drawSongText(QPainter *painter, bool isShadow)
         if(interleavedMode)
         {
             drawSongTextInterleaved(painter, true, isShadow, left, caption_rect.bottom(), width, mainh,
-                                    interleavedHFlags, interleavedVFlags, main_text, m_stanza.transliterationText,
-                                    m_sSets.textFont, interleavedTranslitFont, main_rect);
+                                    interleavedHFlags, interleavedVFlags, displayMainText, displayTranslitText,
+                                    m_sSets.textFont, interleavedTranslitFont, m_sSets.transliterationTextColor,
+                                    m_sSets.transliterationTextAlignmentH, interleavedVFlags, main_rect);
         }
         else
         {
             painter->setFont(m_sSets.textFont);
-            main_rect = boundRectOrDrawText(painter, true, left, caption_rect.bottom(), width, mainh, main_flags, main_text);
+            main_rect = boundRectOrDrawText(painter, true, left, caption_rect.bottom(), width, mainh, main_flags, displayMainText);
         }
         painter->setFont(m_sSets.endingFont);
         if(isShadow)
@@ -781,13 +909,14 @@ void ImageGenerator::drawSongText(QPainter *painter, bool isShadow)
         if(interleavedMode)
         {
             drawSongTextInterleaved(painter, true, isShadow, left, caption_rect.bottom(), width, mainh,
-                                    interleavedHFlags, interleavedVFlags, main_text, m_stanza.transliterationText,
-                                    m_sSets.textFont, interleavedTranslitFont, main_rect);
+                                    interleavedHFlags, interleavedVFlags, displayMainText, displayTranslitText,
+                                    m_sSets.textFont, interleavedTranslitFont, m_sSets.transliterationTextColor,
+                                    m_sSets.transliterationTextAlignmentH, interleavedVFlags, main_rect);
         }
         else
         {
             painter->setFont(m_sSets.textFont);
-            main_rect = boundRectOrDrawText(painter, true, left, caption_rect.bottom(), width, mainh, main_flags, main_text);
+            main_rect = boundRectOrDrawText(painter, true, left, caption_rect.bottom(), width, mainh, main_flags, displayMainText);
         }
     }
     else if(m_sSets.infoAling == 1 && m_sSets.endingPosition == 0)
@@ -799,13 +928,14 @@ void ImageGenerator::drawSongText(QPainter *painter, bool isShadow)
         if(interleavedMode)
         {
             drawSongTextInterleaved(painter, true, isShadow, left, top, width, mainh,
-                                    interleavedHFlags, interleavedVFlags, main_text, m_stanza.transliterationText,
-                                    m_sSets.textFont, interleavedTranslitFont, main_rect);
+                                    interleavedHFlags, interleavedVFlags, displayMainText, displayTranslitText,
+                                    m_sSets.textFont, interleavedTranslitFont, m_sSets.transliterationTextColor,
+                                    m_sSets.transliterationTextAlignmentH, interleavedVFlags, main_rect);
         }
         else
         {
             painter->setFont(m_sSets.textFont);
-            main_rect = boundRectOrDrawText(painter, true, left, top, width, mainh, main_flags, main_text);
+            main_rect = boundRectOrDrawText(painter, true, left, top, width, mainh, main_flags, displayMainText);
         }
         painter->setFont(m_sSets.infoFont);
         if(isShadow)
@@ -831,13 +961,14 @@ void ImageGenerator::drawSongText(QPainter *painter, bool isShadow)
         if(interleavedMode)
         {
             drawSongTextInterleaved(painter, true, isShadow, left, top, width, mainh,
-                                    interleavedHFlags, interleavedVFlags, main_text, m_stanza.transliterationText,
-                                    m_sSets.textFont, interleavedTranslitFont, main_rect);
+                                    interleavedHFlags, interleavedVFlags, displayMainText, displayTranslitText,
+                                    m_sSets.textFont, interleavedTranslitFont, m_sSets.transliterationTextColor,
+                                    m_sSets.transliterationTextAlignmentH, interleavedVFlags, main_rect);
         }
         else
         {
             painter->setFont(m_sSets.textFont);
-            main_rect = boundRectOrDrawText(painter, true, left, top, width, mainh, main_flags, main_text);
+            main_rect = boundRectOrDrawText(painter, true, left, top, width, mainh, main_flags, displayMainText);
         }
         painter->setFont(m_sSets.infoFont);
         if(isShadow)
@@ -859,14 +990,16 @@ void ImageGenerator::drawSongTextInterleaved(QPainter *painter, bool draw, bool 
                                              int width, int height, int hFlags, int vFlags,
                                              const QString &mainText, const QString &translitText,
                                              const QFont &mainFont, const QFont &translitFont,
+                                             const QColor &translitColor, int translitHAlign, int translitVAlign,
                                              QRect &outRect)
 {
     QStringList mainLines = mainText.split("\n");
     QStringList translitLines = translitText.split("\n");
 
-    // Gap between line pairs (Russian+translit grouped, then gap before next pair)
+    // Gap between one song-line pair and the next.
     int mainLineH = QFontMetrics(mainFont).height();
-    int pairGap = mainLineH / 3;
+    int pairGap = qMax(0, m_sSets.songLineSpacing * 3);
+    int translitGap = qMax(0, m_sSets.transliterationLineSpacing * 3);
 
     // First pass: measure total content height and max width
     int totalContentH = 0;
@@ -904,17 +1037,18 @@ void ImageGenerator::drawSongTextInterleaved(QPainter *painter, bool draw, bool 
             QRect tr = painter->boundingRect(left, 0, width, height, hFlags | Qt::AlignTop, translitLines[i]);
             m.trH = tr.height();
             m.trW = tr.width();
-            totalContentH += m.trH;
+            totalContentH += translitGap + m.trH;
             if(m.trW > maxW) maxW = m.trW;
         }
         measures.append(m);
     }
 
-    // Calculate vertical offset based on vFlags
+    // Calculate vertical offset based on vFlags (or translitVAlign for measurement pass)
     int startY = top;
-    if(vFlags & Qt::AlignVCenter)
+    int effectiveVAlign = draw ? vFlags : translitVAlign;
+    if(effectiveVAlign & Qt::AlignVCenter)
         startY = top + (height - totalContentH) / 2;
-    else if(vFlags & Qt::AlignBottom)
+    else if(effectiveVAlign & Qt::AlignBottom)
         startY = top + height - totalContentH;
 
     outRect = QRect(left, startY, maxW, totalContentH);
@@ -925,7 +1059,7 @@ void ImageGenerator::drawSongTextInterleaved(QPainter *painter, bool draw, bool 
     // Second pass: draw lines with gap between pairs, word-by-word alignment
     QPen savedPen = painter->pen();
     // Transliteration color: only apply for normal pass, shadow pass keeps shadow color
-    QPen translitPen = isShadow ? savedPen : QPen(QColor("#edffc3"));
+    QPen translitPen = isShadow ? savedPen : QPen(translitColor);
     int curY = startY;
     for(int i = 0; i < mainLines.size(); ++i)
     {
@@ -966,6 +1100,7 @@ void ImageGenerator::drawSongTextInterleaved(QPainter *painter, bool draw, bool 
 
             // Measure each Russian word's X position and draw translit word there
             painter->setFont(translitFont);
+            curY = lineRect.bottom() + translitGap;
             int ruX = lineStartX;
             for(int w = 0; w < mainWords.size(); ++w)
             {

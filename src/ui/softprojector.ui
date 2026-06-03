@@ -419,7 +419,7 @@
     <string>Open Help</string>
    </property>
    <property name="shortcut">
-    <string>F1</string>
+    <string>Ctrl+F1</string>
    </property>
   </action>
   <action name="actionSong_Counter">
@@ -560,8 +560,11 @@
    <property name="text">
     <string>Add to Schedule</string>
    </property>
+  <property name="toolTip">
+   <string>Add to Schedule (F5)</string>
+  </property>
    <property name="shortcut">
-    <string>F2</string>
+   <string>F5</string>
    </property>
   </action>
   <action name="actionScheduleRemove">
@@ -572,8 +575,11 @@
    <property name="text">
     <string>Remove from Schedule</string>
    </property>
+  <property name="toolTip">
+   <string>Remove from Schedule (F6)</string>
+  </property>
    <property name="shortcut">
-    <string>Del</string>
+   <string>F6</string>
    </property>
   </action>
   <action name="actionScheduleClear">
@@ -594,7 +600,10 @@
     <string>Move Item To Top</string>
    </property>
    <property name="toolTip">
-    <string>Move Schedule item to top of the list</string>
+    <string>Move Schedule item to top of the list (F1)</string>
+     </property>
+     <property name="shortcut">
+    <string>F1</string>
    </property>
   </action>
   <action name="actionMoveScheduleUp">
@@ -606,7 +615,10 @@
     <string>Move Item Up</string>
    </property>
    <property name="toolTip">
-    <string>Move Schedule item up</string>
+    <string>Move Schedule item up (F2)</string>
+     </property>
+     <property name="shortcut">
+    <string>F2</string>
    </property>
   </action>
   <action name="actionMoveScheduleDown">
@@ -618,7 +630,10 @@
     <string>Mode Item Down</string>
    </property>
    <property name="toolTip">
-    <string>Move Schedule item down</string>
+    <string>Move Schedule item down (F3)</string>
+     </property>
+     <property name="shortcut">
+    <string>F3</string>
    </property>
   </action>
   <action name="actionMoveScheduleBottom">
@@ -630,7 +645,10 @@
     <string>Move Item To Bottom</string>
    </property>
    <property name="toolTip">
-    <string>Move Schedule item to bottom of the list</string>
+    <string>Move Schedule item to bottom of the list (F4)</string>
+     </property>
+     <property name="shortcut">
+    <string>F4</string>
    </property>
   </action>
   <action name="actionShow">
@@ -642,10 +660,7 @@
     <string>Show</string>
    </property>
    <property name="toolTip">
-    <string>Display to the screen (F4)</string>
-   </property>
-   <property name="shortcut">
-    <string>F4</string>
+    <string>Display to the screen</string>
    </property>
   </action>
   <action name="actionHide">

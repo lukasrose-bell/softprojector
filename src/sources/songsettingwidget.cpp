@@ -126,15 +126,44 @@ void SongSettingWidget::getSettings(SongSettings &settings, SongSettings &settin
     // Save alignment
     mySettings.textAlignmentV = ui->comboBoxVerticalAling->currentIndex();
     mySettings.textAlignmentH = ui->comboBoxHorizontalAling->currentIndex();
+    mySettings.songLineSpacing = ui->spinBoxSongLineSpacing->value();
 
     mySettings2.textAlignmentV = ui->comboBoxVerticalAling2->currentIndex();
     mySettings2.textAlignmentH = ui->comboBoxHorizontalAling2->currentIndex();
+    mySettings2.songLineSpacing = ui->spinBoxSongLineSpacing2->value();
 
     mySettings3.textAlignmentV = ui->comboBoxVerticalAling3->currentIndex();
     mySettings3.textAlignmentH = ui->comboBoxHorizontalAling3->currentIndex();
+    mySettings3.songLineSpacing = ui->spinBoxSongLineSpacing3->value();
 
     mySettings4.textAlignmentV = ui->comboBoxVerticalAling4->currentIndex();
     mySettings4.textAlignmentH = ui->comboBoxHorizontalAling4->currentIndex();
+    mySettings4.songLineSpacing = ui->spinBoxSongLineSpacing4->value();
+
+    // Save transliteration alignment
+    mySettings.transliterationTextAlignmentV = ui->comboBoxTranslitVerticalAlign->currentIndex();
+    mySettings.transliterationTextAlignmentH = ui->comboBoxTranslitHorizontalAlign->currentIndex();
+    mySettings.transliterationLineSpacing = ui->spinBoxTranslitSpacing->value();
+    mySettings.transliterationCompactEnabled = ui->checkBoxTranslitCompact->isChecked();
+    mySettings.transliterationCompactThreshold = ui->spinBoxTranslitCompactThreshold->value();
+
+    mySettings2.transliterationTextAlignmentV = ui->comboBoxTranslitVerticalAlign2->currentIndex();
+    mySettings2.transliterationTextAlignmentH = ui->comboBoxTranslitHorizontalAlign2->currentIndex();
+    mySettings2.transliterationLineSpacing = ui->spinBoxTranslitSpacing2->value();
+    mySettings2.transliterationCompactEnabled = ui->checkBoxTranslitCompact2->isChecked();
+    mySettings2.transliterationCompactThreshold = ui->spinBoxTranslitCompactThreshold2->value();
+
+    mySettings3.transliterationTextAlignmentV = ui->comboBoxTranslitVerticalAlign3->currentIndex();
+    mySettings3.transliterationTextAlignmentH = ui->comboBoxTranslitHorizontalAlign3->currentIndex();
+    mySettings3.transliterationLineSpacing = ui->spinBoxTranslitSpacing3->value();
+    mySettings3.transliterationCompactEnabled = ui->checkBoxTranslitCompact3->isChecked();
+    mySettings3.transliterationCompactThreshold = ui->spinBoxTranslitCompactThreshold3->value();
+
+    mySettings4.transliterationTextAlignmentV = ui->comboBoxTranslitVerticalAlign4->currentIndex();
+    mySettings4.transliterationTextAlignmentH = ui->comboBoxTranslitHorizontalAlign4->currentIndex();
+    mySettings4.transliterationLineSpacing = ui->spinBoxTranslitSpacing4->value();
+    mySettings4.transliterationCompactEnabled = ui->checkBoxTranslitCompact4->isChecked();
+    mySettings4.transliterationCompactThreshold = ui->spinBoxTranslitCompactThreshold4->value();
 
     // Background Color 4 Text Group
     mySettings.songAddBKColorToText = ui->groupBoxSongAddBKToText->isChecked();
@@ -272,24 +301,65 @@ void SongSettingWidget::loadSettings()
     ui->labelFont->setText(getFontText(mySettings.textFont));
     ui->comboBoxVerticalAling->setCurrentIndex(mySettings.textAlignmentV);
     ui->comboBoxHorizontalAling->setCurrentIndex(mySettings.textAlignmentH);
+    ui->spinBoxSongLineSpacing->setValue(mySettings.songLineSpacing);
 
     p.setColor(QPalette::Base,mySettings2.textColor);
     ui->graphicViewTextColor2->setPalette(p);
     ui->labelFont2->setText(getFontText(mySettings2.textFont));
     ui->comboBoxVerticalAling2->setCurrentIndex(mySettings2.textAlignmentV);
     ui->comboBoxHorizontalAling2->setCurrentIndex(mySettings2.textAlignmentH);
+    ui->spinBoxSongLineSpacing2->setValue(mySettings2.songLineSpacing);
 
     p.setColor(QPalette::Base,mySettings3.textColor);
     ui->graphicViewTextColor3->setPalette(p);
     ui->labelFont3->setText(getFontText(mySettings3.textFont));
     ui->comboBoxVerticalAling3->setCurrentIndex(mySettings3.textAlignmentV);
     ui->comboBoxHorizontalAling3->setCurrentIndex(mySettings3.textAlignmentH);
+    ui->spinBoxSongLineSpacing3->setValue(mySettings3.songLineSpacing);
 
     p.setColor(QPalette::Base,mySettings4.textColor);
     ui->graphicViewTextColor4->setPalette(p);
     ui->labelFont4->setText(getFontText(mySettings4.textFont));
     ui->comboBoxVerticalAling4->setCurrentIndex(mySettings4.textAlignmentV);
     ui->comboBoxHorizontalAling4->setCurrentIndex(mySettings4.textAlignmentH);
+    ui->spinBoxSongLineSpacing4->setValue(mySettings4.songLineSpacing);
+
+    // Set Transliteration Text Properties
+    p.setColor(QPalette::Base,mySettings.transliterationTextColor);
+    ui->graphicViewTranslitTextColor->setPalette(p);
+    ui->labelTranslitFont->setText(getFontText(mySettings.transliterationTextFont));
+    ui->comboBoxTranslitVerticalAlign->setCurrentIndex(mySettings.transliterationTextAlignmentV);
+    ui->comboBoxTranslitHorizontalAlign->setCurrentIndex(mySettings.transliterationTextAlignmentH);
+    ui->spinBoxTranslitSpacing->setValue(mySettings.transliterationLineSpacing);
+    ui->checkBoxTranslitCompact->setChecked(mySettings.transliterationCompactEnabled);
+    ui->spinBoxTranslitCompactThreshold->setValue(mySettings.transliterationCompactThreshold);
+
+    p.setColor(QPalette::Base,mySettings2.transliterationTextColor);
+    ui->graphicViewTranslitTextColor2->setPalette(p);
+    ui->labelTranslitFont2->setText(getFontText(mySettings2.transliterationTextFont));
+    ui->comboBoxTranslitVerticalAlign2->setCurrentIndex(mySettings2.transliterationTextAlignmentV);
+    ui->comboBoxTranslitHorizontalAlign2->setCurrentIndex(mySettings2.transliterationTextAlignmentH);
+    ui->spinBoxTranslitSpacing2->setValue(mySettings2.transliterationLineSpacing);
+    ui->checkBoxTranslitCompact2->setChecked(mySettings2.transliterationCompactEnabled);
+    ui->spinBoxTranslitCompactThreshold2->setValue(mySettings2.transliterationCompactThreshold);
+
+    p.setColor(QPalette::Base,mySettings3.transliterationTextColor);
+    ui->graphicViewTranslitTextColor3->setPalette(p);
+    ui->labelTranslitFont3->setText(getFontText(mySettings3.transliterationTextFont));
+    ui->comboBoxTranslitVerticalAlign3->setCurrentIndex(mySettings3.transliterationTextAlignmentV);
+    ui->comboBoxTranslitHorizontalAlign3->setCurrentIndex(mySettings3.transliterationTextAlignmentH);
+    ui->spinBoxTranslitSpacing3->setValue(mySettings3.transliterationLineSpacing);
+    ui->checkBoxTranslitCompact3->setChecked(mySettings3.transliterationCompactEnabled);
+    ui->spinBoxTranslitCompactThreshold3->setValue(mySettings3.transliterationCompactThreshold);
+
+    p.setColor(QPalette::Base,mySettings4.transliterationTextColor);
+    ui->graphicViewTranslitTextColor4->setPalette(p);
+    ui->labelTranslitFont4->setText(getFontText(mySettings4.transliterationTextFont));
+    ui->comboBoxTranslitVerticalAlign4->setCurrentIndex(mySettings4.transliterationTextAlignmentV);
+    ui->comboBoxTranslitHorizontalAlign4->setCurrentIndex(mySettings4.transliterationTextAlignmentH);
+    ui->spinBoxTranslitSpacing4->setValue(mySettings4.transliterationLineSpacing);
+    ui->checkBoxTranslitCompact4->setChecked(mySettings4.transliterationCompactEnabled);
+    ui->spinBoxTranslitCompactThreshold4->setValue(mySettings4.transliterationCompactThreshold);
 
     // Background Color 4 Text
     // Display 1
@@ -708,6 +778,86 @@ void SongSettingWidget::on_toolButtonFont4_clicked()
     ui->labelFont4->setText(getFontText(mySettings4.textFont));
 }
 
+void SongSettingWidget::on_toolButtonTranslitColor_clicked()
+{
+    QColor c(QColorDialog::getColor(mySettings.transliterationTextColor,this));
+    if(c.isValid())
+        mySettings.transliterationTextColor = c;
+    QPalette p;
+    p.setColor(QPalette::Base,mySettings.transliterationTextColor);
+    ui->graphicViewTranslitTextColor->setPalette(p);
+}
+
+void SongSettingWidget::on_toolButtonTranslitColor2_clicked()
+{
+    QColor c(QColorDialog::getColor(mySettings2.transliterationTextColor,this));
+    if(c.isValid())
+        mySettings2.transliterationTextColor = c;
+    QPalette p;
+    p.setColor(QPalette::Base,mySettings2.transliterationTextColor);
+    ui->graphicViewTranslitTextColor2->setPalette(p);
+}
+
+void SongSettingWidget::on_toolButtonTranslitColor3_clicked()
+{
+    QColor c(QColorDialog::getColor(mySettings3.transliterationTextColor,this));
+    if(c.isValid())
+        mySettings3.transliterationTextColor = c;
+    QPalette p;
+    p.setColor(QPalette::Base,mySettings3.transliterationTextColor);
+    ui->graphicViewTranslitTextColor3->setPalette(p);
+}
+
+void SongSettingWidget::on_toolButtonTranslitColor4_clicked()
+{
+    QColor c(QColorDialog::getColor(mySettings4.transliterationTextColor,this));
+    if(c.isValid())
+        mySettings4.transliterationTextColor = c;
+    QPalette p;
+    p.setColor(QPalette::Base,mySettings4.transliterationTextColor);
+    ui->graphicViewTranslitTextColor4->setPalette(p);
+}
+
+void SongSettingWidget::on_toolButtonTranslitFont_clicked()
+{
+    bool ok;
+    QFont font = QFontDialog::getFont(&ok,mySettings.transliterationTextFont,this);
+    if(ok)
+        mySettings.transliterationTextFont = font;
+
+    ui->labelTranslitFont->setText(getFontText(mySettings.transliterationTextFont));
+}
+
+void SongSettingWidget::on_toolButtonTranslitFont2_clicked()
+{
+    bool ok;
+    QFont font = QFontDialog::getFont(&ok,mySettings2.transliterationTextFont,this);
+    if(ok)
+        mySettings2.transliterationTextFont = font;
+
+    ui->labelTranslitFont2->setText(getFontText(mySettings2.transliterationTextFont));
+}
+
+void SongSettingWidget::on_toolButtonTranslitFont3_clicked()
+{
+    bool ok;
+    QFont font = QFontDialog::getFont(&ok,mySettings3.transliterationTextFont,this);
+    if(ok)
+        mySettings3.transliterationTextFont = font;
+
+    ui->labelTranslitFont3->setText(getFontText(mySettings3.transliterationTextFont));
+}
+
+void SongSettingWidget::on_toolButtonTranslitFont4_clicked()
+{
+    bool ok;
+    QFont font = QFontDialog::getFont(&ok,mySettings4.transliterationTextFont,this);
+    if(ok)
+        mySettings4.transliterationTextFont = font;
+
+    ui->labelTranslitFont4->setText(getFontText(mySettings4.transliterationTextFont));
+}
+
 void SongSettingWidget::on_groupBoxSongAddBKToText_toggled(bool arg1)
 {
     QColor c(mySettings.songTextGenBKColor);
@@ -918,6 +1068,7 @@ void SongSettingWidget::on_groupBoxDisplay2_toggled(bool arg1)
     ui->groupBoxSongEnding2->setVisible(arg1);
     ui->groupBoxSongInfo2->setVisible(arg1);
     ui->groupBoxTextProperties2->setVisible(arg1);
+    ui->groupBoxTranslitTextProperties2->setVisible(arg1);
     ui->groupBoxSongAddBKToText2->setVisible(arg1);
     ui->groupBoxScreenUse2->setVisible(arg1);
 }
@@ -929,6 +1080,7 @@ void SongSettingWidget::on_groupBoxDisplay3_toggled(bool arg1)
     ui->groupBoxSongEnding3->setVisible(arg1);
     ui->groupBoxSongInfo3->setVisible(arg1);
     ui->groupBoxTextProperties3->setVisible(arg1);
+    ui->groupBoxTranslitTextProperties3->setVisible(arg1);
     ui->groupBoxSongAddBKToText3->setVisible(arg1);
     ui->groupBoxScreenUse3->setVisible(arg1);
 }
@@ -940,6 +1092,7 @@ void SongSettingWidget::on_groupBoxDisplay4_toggled(bool arg1)
     ui->groupBoxSongEnding4->setVisible(arg1);
     ui->groupBoxSongInfo4->setVisible(arg1);
     ui->groupBoxTextProperties4->setVisible(arg1);
+    ui->groupBoxTranslitTextProperties4->setVisible(arg1);
     ui->groupBoxSongAddBKToText4->setVisible(arg1);
     ui->groupBoxScreenUse4->setVisible(arg1);
 }

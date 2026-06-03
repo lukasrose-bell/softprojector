@@ -87,6 +87,11 @@ public:
     QFont textFont;
     int textAlignmentV;
     int textAlignmentH;
+    // Transliteration text properties
+    QColor transliterationTextColor;
+    QFont transliterationTextFont;
+    int transliterationTextAlignmentV;
+    int transliterationTextAlignmentH;
     int screenUse;
     int screenPositon; // 0 = Top, 1 = Bottom
     bool useDisp2settings;

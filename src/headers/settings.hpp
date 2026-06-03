@@ -272,6 +272,16 @@ public:
     QColor songTextRecBKColor;
     QColor songTextGenBKColor;
 
+    // Transliteration text properties
+    QColor transliterationTextColor;
+    QFont transliterationTextFont;
+    int transliterationTextAlignmentV;
+    int transliterationTextAlignmentH;
+    int songLineSpacing;
+    int transliterationLineSpacing;
+    bool transliterationCompactEnabled;
+    int transliterationCompactThreshold;
+
     void save();
     void save(QSqlQuery &sq);
     void update();

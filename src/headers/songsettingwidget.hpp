@@ -80,6 +80,14 @@ private slots:
     void on_toolButtonFont2_clicked();
     void on_toolButtonFont3_clicked();
     void on_toolButtonFont4_clicked();
+    void on_toolButtonTranslitColor_clicked();
+    void on_toolButtonTranslitColor2_clicked();
+    void on_toolButtonTranslitColor3_clicked();
+    void on_toolButtonTranslitColor4_clicked();
+    void on_toolButtonTranslitFont_clicked();
+    void on_toolButtonTranslitFont2_clicked();
+    void on_toolButtonTranslitFont3_clicked();
+    void on_toolButtonTranslitFont4_clicked();
     void on_groupBoxSongAddBKToText_toggled(bool arg1);
     void on_groupBoxSongAddBKToText2_toggled(bool arg1);
     void on_groupBoxSongAddBKToText3_toggled(bool arg1);
